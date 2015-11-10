@@ -2,13 +2,14 @@ package com.jensdriller.libs.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.jensdriller.libs.undobar.UndoBar;
 
-public class TestActivity extends ActionBarActivity {
+public class TestActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

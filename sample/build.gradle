@@ -5,7 +5,7 @@ android {
     buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 15
         targetSdkVersion Integer.parseInt(ANDROID_BUILD_TARGET_SDK_VERSION)
         versionCode Integer.parseInt(VERSION_CODE)
         versionName VERSION_NAME
@@ -13,6 +13,6 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:appcompat-v7:21.0.3"
-    compile project(path: ":library", configuration: "api8Release")
+    compile "com.android.support:appcompat-v7:23.1.0"
+    compile project(path: ":library")
 }
