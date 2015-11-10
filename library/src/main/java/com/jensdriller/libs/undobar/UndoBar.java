@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -106,9 +107,12 @@ public class UndoBar {
         }
     };
 
+    protected boolean mButtonVisible;
     protected Listener mUndoListener;
     protected Parcelable mUndoToken;
     protected CharSequence mUndoMessage;
+    protected CharSequence mButtonLabel;
+    protected Drawable mButtonDrawable;
     protected int mDuration = DEFAULT_DURATION;
     protected int mAnimationDuration = DEFAULT_ANIMATION_DURATION;
     protected boolean mUseEnglishLocale;
@@ -201,6 +205,43 @@ public class UndoBar {
     }
 
     /**
+     * Sets the button(right of the undo bar) should be shown
+     */
+    public void setButtonVisible(boolean isVisible){
+        mButtonVisible = false;
+    }
+
+    /**
+     * Sets the message to be displayed on the right of the undo bar.
+     */
+    public void setButtonLabel(CharSequence buttonLabel){
+        mButtonLabel = buttonLabel;
+    }
+
+    /**
+     * Sets the message to be displayed on the right of the undo bar.
+     */
+    public void setButtonLabel(int buttonLabelRes){
+        mButtonLabel =  mContext.getString(buttonLabelRes);
+    }
+
+    /**
+     * Sets the drawable to be displayed on the right of the undo bar;
+     * can be ignored if Style is LOLLIPOP;
+     */
+    public void setButtonDrawable(Drawable buttonDrawable){
+        mButtonDrawable = buttonDrawable;
+    }
+
+    /**
+     * Sets the drawable to be displayed on the right of the undo bar;
+     * can be ignored if Style is LOLLIPOP;
+     */
+    public void setButtonDrawable(int buttonDrawableRes){
+        mButtonDrawable = mContext.getResources().getDrawable(buttonDrawableRes);
+    }
+
+    /**
      * Sets the {@link Listener UndoBar.Listener}.
      */
     public void setListener(Listener undoListener) {
@@ -288,12 +329,23 @@ public class UndoBar {
      */
     public void show(boolean shouldAnimate) {
         mView.setMessage(mUndoMessage);
-        mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
-        if (isLollipopStyle(mStyle)) {
-            mView.setUndoColor(mUndoColor);
-            if (mAlignParentBottom && isAlignBottomPossible()) {
-                removeMargins(mView);
+        if(mButtonVisible) {
+            if(mButtonDrawable == null && mButtonLabel == null) {
+                mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
+            }else{
+                mView.setButtonLabel(mButtonLabel);
             }
+
+            if (isLollipopStyle(mStyle)) {
+                mView.setUndoColor(mUndoColor);
+                if (mAlignParentBottom && isAlignBottomPossible()) {
+                    removeMargins(mView);
+                }
+            }else{
+                mView.setButtonDrawable(mButtonDrawable);
+            }
+        }else{
+            mView.setButtonVisible(false);
         }
 
         mHandler.removeCallbacks(mHideRunnable);
@@ -457,6 +509,8 @@ public class UndoBar {
         private final Window mWindow;
 
         private CharSequence mUndoMessage;
+        private CharSequence mButtonLabel;
+        private Drawable mButtonDrawable;
         private Listener mUndoListener;
         private Parcelable mUndoToken;
         private int mDuration = DEFAULT_DURATION;
@@ -503,6 +557,31 @@ public class UndoBar {
          */
         public Builder setMessage(CharSequence message) {
             mUndoMessage = message;
+            return this;
+        }
+
+        /**
+         * Sets the Undo message
+         */
+        public Builder setButtonLabel(CharSequence buttonLabel){
+            mButtonLabel = buttonLabel;
+            return this;
+        }
+
+        /**
+         * Sets the Undo drawable
+         * can be ignored due to style...
+         */
+        public Builder setButtonDrawable(Drawable buttonDrawable){
+            mButtonDrawable = buttonDrawable;
+            return this;
+        }
+        /**
+         * Sets the Undo drawable
+         * can be ignored due to style...
+         */
+        public Builder setButtonDrawable(int buttonDrawableRes){
+            mButtonDrawable = mWindow.getContext().getResources().getDrawable(buttonDrawableRes);
             return this;
         }
 
@@ -610,6 +689,12 @@ public class UndoBar {
             undoBarController.setListener(mUndoListener);
             undoBarController.setUndoToken(mUndoToken);
             undoBarController.setMessage(mUndoMessage);
+            if(mButtonLabel != null) {
+                undoBarController.setButtonLabel(mButtonLabel);
+            }
+            if(mButtonDrawable != null) {
+                undoBarController.setButtonDrawable(mButtonDrawable);
+            }
             undoBarController.setDuration(mDuration);
             undoBarController.setAnimationDuration(mAnimationDuration);
             undoBarController.setUseEnglishLocale(mUseEnglishLocale);

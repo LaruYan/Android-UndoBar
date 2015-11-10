@@ -2,10 +2,12 @@ package com.jensdriller.libs.undobar;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.TextView;
 
 class UndoBarView extends MaxWidthRelativeLayout {
@@ -38,13 +40,26 @@ class UndoBarView extends MaxWidthRelativeLayout {
 		mButton = (TextView) findViewById(R.id.button);
 	}
 
+	void setButtonVisible(boolean isVisible){
+		findViewById(R.id.divider).setVisibility(isVisible ? View.VISIBLE : View.GONE);
+		mButton.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+	}
+
 	void setMessage(CharSequence message) {
 		mMessage.setText(message);
+	}
+
+	void setButtonLabel(CharSequence buttonLabel) {
+		mButton.setText(buttonLabel);
 	}
 
     void setButtonLabel(int buttonLabelResId) {
         mButton.setText(buttonLabelResId);
     }
+
+	void setButtonDrawable(Drawable buttonDrawable){
+		mButton.setCompoundDrawables(buttonDrawable,null,null,null);
+	}
 
     void setUndoColor(int color) {
         mButton.setTextColor(color);
