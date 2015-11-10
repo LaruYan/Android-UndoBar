@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -361,13 +360,9 @@ public class UndoBar {
     public void show(boolean shouldAnimate) {
 
         if(isBackgroundColorCustomized) {
-            if (isHoloStyle(mStyle)) {
-                //not yet implemented;
-            } else {
-                Drawable coloredBackground = mView.getBackground();
-                coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_ATOP);
-                mView.setBackgroundDrawable(coloredBackground);
-            }
+            Drawable coloredBackground = mView.getBackground();
+            coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
+            mView.setBackgroundDrawable(coloredBackground);
         }
 
         mView.setMessage(mUndoMessage);
