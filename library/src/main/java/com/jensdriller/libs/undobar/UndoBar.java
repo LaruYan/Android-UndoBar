@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -117,8 +119,13 @@ public class UndoBar {
     protected int mAnimationDuration = DEFAULT_ANIMATION_DURATION;
     protected boolean mUseEnglishLocale;
     protected Style mStyle = Style.DEFAULT;
+    protected int mBkgColor = -1;
     protected int mUndoColor = Color.WHITE;
     protected boolean mAlignParentBottom;
+
+    protected boolean isBackgroundColorCustomized;
+    protected boolean isButtonDrawableCustomized;
+    protected boolean isButtonLabelCustomized;
 
     /**
      * Creates a new undo bar instance to be displayed in the given {@link Activity}.
@@ -191,6 +198,14 @@ public class UndoBar {
     }
 
     /**
+     * Sets the background color of the undo bar;
+     */
+    public void setBackgroundColor(int color){
+        isBackgroundColorCustomized = true;
+        mBkgColor = color;
+    }
+
+    /**
      * Sets the message to be displayed on the left of the undo bar.
      */
     public void setMessage(CharSequence message) {
@@ -208,13 +223,14 @@ public class UndoBar {
      * Sets the button(right of the undo bar) should be shown
      */
     public void setButtonVisible(boolean isVisible){
-        mButtonVisible = false;
+        mButtonVisible = isVisible;
     }
 
     /**
      * Sets the message to be displayed on the right of the undo bar.
      */
     public void setButtonLabel(CharSequence buttonLabel){
+        isButtonLabelCustomized = true;
         mButtonLabel = buttonLabel;
     }
 
@@ -222,7 +238,8 @@ public class UndoBar {
      * Sets the message to be displayed on the right of the undo bar.
      */
     public void setButtonLabel(int buttonLabelRes){
-        mButtonLabel =  mContext.getString(buttonLabelRes);
+        isButtonLabelCustomized = true;
+        mButtonLabel = mContext.getString(buttonLabelRes);
     }
 
     /**
@@ -230,6 +247,7 @@ public class UndoBar {
      * can be ignored if Style is LOLLIPOP;
      */
     public void setButtonDrawable(Drawable buttonDrawable){
+        isButtonDrawableCustomized = true;
         mButtonDrawable = buttonDrawable;
     }
 
@@ -238,6 +256,7 @@ public class UndoBar {
      * can be ignored if Style is LOLLIPOP;
      */
     public void setButtonDrawable(int buttonDrawableRes){
+        isButtonDrawableCustomized = true;
         mButtonDrawable = mContext.getResources().getDrawable(buttonDrawableRes);
     }
 
@@ -315,6 +334,18 @@ public class UndoBar {
         mAlignParentBottom = alignParentBottom;
     }
 
+    private void setButtonLabelCustomized(boolean isCustomized) {
+        isButtonLabelCustomized = isCustomized;
+    }
+
+    private void setButtonDrawableCustomized(boolean isCustomized) {
+        isButtonDrawableCustomized = isCustomized;
+    }
+
+    private void setBackgroundColorCustomized(boolean isCustomized) {
+        isBackgroundColorCustomized = isCustomized;
+    }
+
     /**
      * Calls {@link #show(boolean)} with {@code shouldAnimate = true}.
      */
@@ -328,12 +359,23 @@ public class UndoBar {
      * @param shouldAnimate whether the {@link UndoBar} should animate in
      */
     public void show(boolean shouldAnimate) {
+
+        if(isBackgroundColorCustomized) {
+            if (isHoloStyle(mStyle)) {
+                //not yet implemented;
+            } else {
+                Drawable coloredBackground = mView.getBackground();
+                coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_ATOP);
+                mView.setBackgroundDrawable(coloredBackground);
+            }
+        }
+
         mView.setMessage(mUndoMessage);
         if(mButtonVisible) {
-            if(mButtonDrawable == null && mButtonLabel == null) {
-                mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
-            }else{
+            if(isButtonLabelCustomized){
                 mView.setButtonLabel(mButtonLabel);
+            }else{
+                mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
             }
 
             if (isLollipopStyle(mStyle)) {
@@ -342,7 +384,9 @@ public class UndoBar {
                     removeMargins(mView);
                 }
             }else{
-                mView.setButtonDrawable(mButtonDrawable);
+                if(isButtonDrawableCustomized) {
+                    mView.setButtonDrawable(mButtonDrawable);
+                }
             }
         }else{
             mView.setButtonVisible(false);
@@ -365,6 +409,14 @@ public class UndoBar {
      */
     private boolean isLollipopStyle(Style style) {
         return style == Style.LOLLIPOP || (style == Style.DEFAULT && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+    }
+
+    /**
+     * Checks whether the given style is {@link Style#HOLO}.
+     * Either explicitly set or the system default.
+     */
+    private boolean isHoloStyle(Style style) {
+        return style == Style.HOLO || (style == Style.DEFAULT && Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT);
     }
 
     /**
@@ -508,6 +560,7 @@ public class UndoBar {
 
         private final Window mWindow;
 
+        private boolean mButtonVisible = true;
         private CharSequence mUndoMessage;
         private CharSequence mButtonLabel;
         private Drawable mButtonDrawable;
@@ -517,8 +570,13 @@ public class UndoBar {
         private int mAnimationDuration = DEFAULT_ANIMATION_DURATION;
         private boolean mUseEnglishLocale;
         private Style mStyle;
+        private int mBkgColor = -1;
         private int mUndoColor = Color.WHITE;
         private boolean mAlignParentBottom;
+
+        private boolean isBackgroundColorCustomized = false;
+        private boolean isButtonDrawableCustomized = false;
+        private boolean isButtonLabelCustomized = false;
 
         /**
          * Constructor using the {@link android.app.Activity} in which the undo bar will be
@@ -561,9 +619,18 @@ public class UndoBar {
         }
 
         /**
+         * Sets undo button's visibility;
+         */
+        public Builder setButtonVisible(boolean isVisible){
+            mButtonVisible = isVisible;
+            return this;
+        }
+
+        /**
          * Sets the Undo message
          */
         public Builder setButtonLabel(CharSequence buttonLabel){
+            isButtonLabelCustomized = true;
             mButtonLabel = buttonLabel;
             return this;
         }
@@ -573,6 +640,7 @@ public class UndoBar {
          * can be ignored due to style...
          */
         public Builder setButtonDrawable(Drawable buttonDrawable){
+            isButtonDrawableCustomized = true;
             mButtonDrawable = buttonDrawable;
             return this;
         }
@@ -581,6 +649,7 @@ public class UndoBar {
          * can be ignored due to style...
          */
         public Builder setButtonDrawable(int buttonDrawableRes){
+            isButtonDrawableCustomized = true;
             mButtonDrawable = mWindow.getContext().getResources().getDrawable(buttonDrawableRes);
             return this;
         }
@@ -648,6 +717,17 @@ public class UndoBar {
         }
 
         /**
+         * Sets the background color of the Bar
+         * The default color will vary by Style;
+         * and
+         */
+        public Builder setBackgroundColor(int backgroundColor){
+            isBackgroundColorCustomized = true;
+            mBkgColor = backgroundColor;
+            return this;
+        }
+
+        /**
          * Sets the text color of the undo button.<br>
          * The default color is white.<br>
          * <b>Note:</b> This is only applied to the {@link UndoBar.Style#LOLLIPOP}
@@ -689,17 +769,20 @@ public class UndoBar {
             undoBarController.setListener(mUndoListener);
             undoBarController.setUndoToken(mUndoToken);
             undoBarController.setMessage(mUndoMessage);
-            if(mButtonLabel != null) {
-                undoBarController.setButtonLabel(mButtonLabel);
-            }
-            if(mButtonDrawable != null) {
-                undoBarController.setButtonDrawable(mButtonDrawable);
-            }
+            undoBarController.setButtonVisible(mButtonVisible);
+            undoBarController.setButtonLabel(mButtonLabel);
+            undoBarController.setButtonDrawable(mButtonDrawable);
             undoBarController.setDuration(mDuration);
             undoBarController.setAnimationDuration(mAnimationDuration);
             undoBarController.setUseEnglishLocale(mUseEnglishLocale);
+            undoBarController.setBackgroundColor(mBkgColor);
             undoBarController.setUndoColor(mUndoColor);
             undoBarController.setAlignParentBottom(mAlignParentBottom);
+
+            undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
+            undoBarController.setButtonDrawableCustomized(isButtonDrawableCustomized);
+            undoBarController.setButtonLabelCustomized(isButtonLabelCustomized);
+
             return undoBarController;
         }
 
