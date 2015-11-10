@@ -2,12 +2,12 @@
 
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="#474747" />
+            <solid android:color="#26ffffff" />
         </shape>
     </item>
     <item android:state_focused="true">
         <shape android:shape="rectangle">
-            <solid android:color="#474747" />
+            <solid android:color="#26ffffff" />
         </shape>
     </item>
     <item android:drawable="@android:color/transparent" />
