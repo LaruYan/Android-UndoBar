@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         Toast.makeText(MainActivity.this, "This is stock toast", Toast.LENGTH_SHORT).show();
                     }
-                });
+                });//but no luck
 
                 TextView text = (TextView) layout.findViewById(R.id.text);
                 text.setText("This is a custom toast");
