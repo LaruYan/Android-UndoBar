@@ -23,6 +23,13 @@
         android:id="@+id/btn_dialog_fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing"
         android:text="@string/test_dialog_fragment" />
+
+    <Button
+        android:id="@+id/btn_stock_with_custom_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_stock_custom_view" />
 
 </LinearLayout>
