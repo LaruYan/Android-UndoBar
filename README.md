@@ -48,19 +48,20 @@ new UndoBar.Builder(this)//
 
 Download
 --------
+**There's no way to apply this... sorry not knowing about gradle ...**
 
 Grab it via Gradle:
 
 For **API Level >= 15**:
 
 ```groovy
-compile 'com.github.jenzz.undobar:library:1.3:api15Release@aar'
+compile ':library:1.3:api15Release@aar'
 ```
 
 For **API Level < 15** (includes [nineoldandroids](http://nineoldandroids.com/)):
 
 ```groovy
-compile 'com.github.jenzz.undobar:library:1.3:api8Release@aar'
+compile '.undobar:library:1.3:api8Release@aar'
 ```
 
 Still using Eclipse? Check out the [master_eclipse](https://github.com/jenzz/Android-UndoBar/tree/master_eclipse) branch and import it as a library project.<br />
