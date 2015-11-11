@@ -10,11 +10,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressWarnings({"UnusedDeclaration", "WeakerAccess"})
 public class UndoBar {
@@ -413,16 +416,36 @@ public class UndoBar {
         }else{
             //I dreamed in a dream...
             //lets get back to stock-style Toast.
-            if(isLollipopStyle(mStyle)){
-                //Lollipop style
-
-            }else if(isHoloStyle(mStyle)){
-                //Holo style
-
-            }else{
-                //Kitkat Style
-
+            View toastLayout = LayoutInflater.from(mContext).inflate(mStyle.getLayoutResId(), null);
+            View divider = toastLayout.findViewById(R.id.divider);
+            if(divider != null){
+                divider.setVisibility(View.GONE);
             }
+            (toastLayout.findViewById(R.id.button)).setVisibility(View.GONE);
+
+            TextView tvMessage = (TextView) toastLayout.findViewById(R.id.message);
+            tvMessage.setText(mUndoMessage);
+            if (isBackgroundColorCustomized) {
+                Drawable coloredBackground = toastLayout.getBackground();
+                coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
+                toastLayout.setBackgroundDrawable(coloredBackground);
+            }
+            if(isTypefaceCustomized) {
+                tvMessage.setTypeface(mTypeface);
+            }
+
+            Toast toast = new Toast(mContext);
+            toast.setView(toastLayout);
+            toast.setDuration(mDuration > DEFAULT_DURATION ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+            if (isLollipopStyle(mStyle)) {
+                toast.setGravity(Gravity.BOTTOM, 0, 0);
+                toast.setMargin(0.0f, 0.0f);//but this don't makes us to margin bottom;
+            }
+            toast.show();
+
+            ///for compatibility measures;
+            mHandler.removeCallbacks(mHideRunnable);
+            mHandler.postDelayed(mHideRunnable, mDuration);
         }
     }
 
