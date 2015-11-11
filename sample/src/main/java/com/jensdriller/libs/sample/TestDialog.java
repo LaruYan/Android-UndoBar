@@ -33,9 +33,26 @@ public class TestDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 UndoBar undoBar = new UndoBar.Builder(TestDialog.this)//
-                        .setMessage("Undo Me!")//
+                        .setMessage(R.string.toast_message)//
                         .setStyle((UndoBar.Style) spinner.getSelectedItem())//
+                        .setBackgroundColor(0xffFF0000)
                         .setUndoColor(getContext().getResources().getColor(R.color.primaryColor))
+                        .create();
+                logView.bind(undoBar);
+                logView.log("show()");
+                undoBar.show();
+            }
+        });
+
+        findViewById(R.id.btn_show_stock).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UndoBar undoBar = new UndoBar.Builder(TestDialog.this)//
+                        .setMessage(R.string.toast_message)//
+                        .setStyle((UndoBar.Style) spinner.getSelectedItem())//
+                        .setBackgroundColor(0xffFF0000)
+                        .setUndoColor(getContext().getResources().getColor(R.color.primaryColor))
+                        .setButtonVisible(false)
                         .create();
                 logView.bind(undoBar);
                 logView.log("show()");
