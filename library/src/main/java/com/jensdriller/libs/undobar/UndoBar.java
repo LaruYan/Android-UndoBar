@@ -370,47 +370,59 @@ public class UndoBar {
      * @param shouldAnimate whether the {@link UndoBar} should animate in
      */
     public void show(boolean shouldAnimate) {
-
-        if(isBackgroundColorCustomized) {
-            Drawable coloredBackground = mView.getBackground();
-            coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
-            mView.setBackgroundDrawable(coloredBackground);
-        }
-
-        if(isTypefaceCustomized){
-            mView.setTypeface(mTypeface);
-        }
-
-        mView.setMessage(mUndoMessage);
         if(mButtonVisible) {
-            if(isButtonLabelCustomized){
-                mView.setButtonLabel(mButtonLabel);
-            }else{
-                mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
+            if (isBackgroundColorCustomized) {
+                Drawable coloredBackground = mView.getBackground();
+                coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
+                mView.setBackgroundDrawable(coloredBackground);
             }
 
-            if (isLollipopStyle(mStyle)) {
-                mView.setUndoColor(mUndoColor);
-                if (mAlignParentBottom && isAlignBottomPossible()) {
-                    removeMargins(mView);
+            if (isTypefaceCustomized) {
+                mView.setTypeface(mTypeface);
+            }
+
+            mView.setMessage(mUndoMessage);
+            if (mButtonVisible) {
+                if (isButtonLabelCustomized) {
+                    mView.setButtonLabel(mButtonLabel);
+                } else {
+                    mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
                 }
-            }else{
-                if(isButtonDrawableCustomized) {
-                    mView.setButtonDrawable(mButtonDrawable);
+
+                if (isLollipopStyle(mStyle)) {
+                    mView.setUndoColor(mUndoColor);
+                    if (mAlignParentBottom && isAlignBottomPossible()) {
+                        removeMargins(mView);
+                    }
+                } else {
+                    if (isButtonDrawableCustomized) {
+                        mView.setButtonDrawable(mButtonDrawable);
+                    }
                 }
+            }
+
+            mHandler.removeCallbacks(mHideRunnable);
+            mHandler.postDelayed(mHideRunnable, mDuration);
+
+            mView.setVisibility(View.VISIBLE);
+            if (shouldAnimate) {
+                animateIn();
+            } else {
+                mViewCompat.setAlpha(1);
             }
         }else{
-            mView.setButtonVisible(false);
-        }
+            //I dreamed in a dream...
+            //lets get back to stock-style Toast.
+            if(isLollipopStyle(mStyle)){
+                //Lollipop style
 
-        mHandler.removeCallbacks(mHideRunnable);
-        mHandler.postDelayed(mHideRunnable, mDuration);
+            }else if(isHoloStyle(mStyle)){
+                //Holo style
 
-        mView.setVisibility(View.VISIBLE);
-        if (shouldAnimate) {
-            animateIn();
-        } else {
-            mViewCompat.setAlpha(1);
+            }else{
+                //Kitkat Style
+
+            }
         }
     }
 

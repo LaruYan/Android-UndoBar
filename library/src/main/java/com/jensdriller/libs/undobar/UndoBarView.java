@@ -41,6 +41,7 @@ class UndoBarView extends MaxWidthRelativeLayout {
 		mButton = (TextView) findViewById(R.id.button);
 	}
 
+	@Deprecated
 	void setButtonVisible(boolean isVisible){
 		View divider = findViewById(R.id.divider);
 		if(divider != null){
