@@ -8,5 +8,6 @@
     <string name="test_stock_custom_view">Stock with custom view</string>
     <string name="show_undo_bar">Show UndoBar</string>
     <string name="undo_log">Undo Log:</string>
+    <string name="toast_message">message</string>
 
 </resources>

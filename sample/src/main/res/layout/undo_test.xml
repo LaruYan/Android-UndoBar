@@ -16,6 +16,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/show_undo_bar" />
+    <Button
+        android:id="@+id/btn_show_stock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_undo_bar" />
 
     <com.jensdriller.libs.sample.LogView
         android:id="@+id/log"

@@ -24,11 +24,28 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 UndoBar undoBar = new UndoBar.Builder(TestActivity.this)//
-                        .setMessage("실행 취소를 실행 취소하고 실행 취소를 실행 취소하고 실행취소를 그만해!!!")//
+                        .setMessage(R.string.toast_message)//
                         .setStyle((UndoBar.Style) spinner.getSelectedItem())//
                         .setBackgroundColor(0xffFF0000)
                         .setUndoColor(getResources().getColor(R.color.primaryColor))
                         .setAlignParentBottom(true)
+                        .create();
+                logView.bind(undoBar);
+                logView.log("show()");
+                undoBar.show();
+            }
+        });
+
+        findViewById(R.id.btn_show_stock).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UndoBar undoBar = new UndoBar.Builder(TestActivity.this)//
+                        .setMessage(R.string.toast_message)//
+                        .setStyle((UndoBar.Style) spinner.getSelectedItem())//
+                        .setBackgroundColor(0xffFF0000)
+                        .setUndoColor(getResources().getColor(R.color.primaryColor))
+                        .setAlignParentBottom(true)
+                        .setButtonVisible(false)
                         .create();
                 logView.bind(undoBar);
                 logView.log("show()");
