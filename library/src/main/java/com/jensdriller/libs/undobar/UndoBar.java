@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
@@ -109,6 +110,7 @@ public class UndoBar {
     };
 
     protected boolean mButtonVisible;
+    protected Typeface mTypeface;
     protected Listener mUndoListener;
     protected Parcelable mUndoToken;
     protected CharSequence mUndoMessage;
@@ -125,6 +127,7 @@ public class UndoBar {
     protected boolean isBackgroundColorCustomized;
     protected boolean isButtonDrawableCustomized;
     protected boolean isButtonLabelCustomized;
+    protected boolean isTypefaceCustomized;
 
     /**
      * Creates a new undo bar instance to be displayed in the given {@link Activity}.
@@ -223,6 +226,11 @@ public class UndoBar {
      */
     public void setButtonVisible(boolean isVisible){
         mButtonVisible = isVisible;
+    }
+
+    public void setTypeface(Typeface typeface){
+        isTypefaceCustomized = true;
+        mTypeface = typeface;
     }
 
     /**
@@ -345,6 +353,10 @@ public class UndoBar {
         isBackgroundColorCustomized = isCustomized;
     }
 
+    private void setTypefaceCustomized(boolean isCustomized) {
+        isTypefaceCustomized = isCustomized;
+    }
+
     /**
      * Calls {@link #show(boolean)} with {@code shouldAnimate = true}.
      */
@@ -363,6 +375,10 @@ public class UndoBar {
             Drawable coloredBackground = mView.getBackground();
             coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
             mView.setBackgroundDrawable(coloredBackground);
+        }
+
+        if(isTypefaceCustomized){
+            mView.setTypeface(mTypeface);
         }
 
         mView.setMessage(mUndoMessage);
@@ -556,6 +572,7 @@ public class UndoBar {
         private final Window mWindow;
 
         private boolean mButtonVisible = true;
+        private Typeface mTypeface;
         private CharSequence mUndoMessage;
         private CharSequence mButtonLabel;
         private Drawable mButtonDrawable;
@@ -572,6 +589,7 @@ public class UndoBar {
         private boolean isBackgroundColorCustomized = false;
         private boolean isButtonDrawableCustomized = false;
         private boolean isButtonLabelCustomized = false;
+        private boolean isTypefaceCustomized = false;
 
         /**
          * Constructor using the {@link android.app.Activity} in which the undo bar will be
@@ -618,6 +636,15 @@ public class UndoBar {
          */
         public Builder setButtonVisible(boolean isVisible){
             mButtonVisible = isVisible;
+            return this;
+        }
+
+        /**
+         * Sets undo bar's typeface;
+         */
+        public Builder setTypeface(Typeface typeface){
+            isTypefaceCustomized = true;
+            mTypeface = typeface;
             return this;
         }
 
@@ -765,6 +792,7 @@ public class UndoBar {
             undoBarController.setUndoToken(mUndoToken);
             undoBarController.setMessage(mUndoMessage);
             undoBarController.setButtonVisible(mButtonVisible);
+            undoBarController.setTypeface(mTypeface);
             undoBarController.setButtonLabel(mButtonLabel);
             undoBarController.setButtonDrawable(mButtonDrawable);
             undoBarController.setDuration(mDuration);
@@ -777,6 +805,7 @@ public class UndoBar {
             undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
             undoBarController.setButtonDrawableCustomized(isButtonDrawableCustomized);
             undoBarController.setButtonLabelCustomized(isButtonLabelCustomized);
+            undoBarController.setTypefaceCustomized(isTypefaceCustomized);
 
             return undoBarController;
         }
@@ -798,4 +827,5 @@ public class UndoBar {
             create().show(shouldAnimate);
         }
     }
+
 }

@@ -2,6 +2,7 @@ package com.jensdriller.libs.undobar;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Parcel;
@@ -46,6 +47,11 @@ class UndoBarView extends MaxWidthRelativeLayout {
 			divider.setVisibility(isVisible ? View.VISIBLE : View.GONE);
 		}
 		mButton.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+	}
+
+	void setTypeface(Typeface typeface){
+		mMessage.setTypeface(typeface);
+		mButton.setTypeface(typeface);
 	}
 
 	void setMessage(CharSequence message) {
