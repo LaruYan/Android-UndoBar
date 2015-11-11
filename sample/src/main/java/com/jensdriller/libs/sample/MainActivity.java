@@ -47,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
                 View layout = inflater.inflate(R.layout.toast_layout,
                         (ViewGroup) findViewById(R.id.toast_layout_root));
 
+                layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "This is stock toast", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 TextView text = (TextView) layout.findViewById(R.id.text);
                 text.setText("This is a custom toast");
 
