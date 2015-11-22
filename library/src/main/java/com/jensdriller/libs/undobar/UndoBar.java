@@ -126,6 +126,7 @@ public class UndoBar {
     protected int mBkgColor = -1;
     protected int mUndoColor = Color.WHITE;
     protected boolean mAlignParentBottom;
+    protected int mBottomMargin;
 
     protected boolean isBackgroundColorCustomized;
     protected boolean isButtonDrawableCustomized;
@@ -366,6 +367,10 @@ public class UndoBar {
         mAlignParentBottom = alignParentBottom;
     }
 
+    public void setBottomMargin(int bottomMargin) {
+        mBottomMargin = bottomMargin;
+    }
+
     private void setButtonLabelCustomized(boolean isCustomized) {
         isButtonLabelCustomized = isCustomized;
     }
@@ -426,6 +431,7 @@ public class UndoBar {
                 if (isButtonDrawableCustomized) {
                     mView.setButtonDrawable(mButtonDrawable);
                 }
+                setBottomMargins(mView, mBottomMargin);
             }
 
             mHandler.removeCallbacks(mHideRunnable);
@@ -441,6 +447,8 @@ public class UndoBar {
             //I dreamed in a dream...
             //lets get back to stock-style Toast.
             View toastLayout = LayoutInflater.from(mContext).inflate(mStyle.getLayoutResId(), null);
+            setBottomMargins(toastLayout, mBottomMargin);
+
             View divider = toastLayout.findViewById(R.id.divider);
             if(divider != null){
                 divider.setVisibility(View.GONE);
@@ -504,6 +512,20 @@ public class UndoBar {
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
         layoutParams.leftMargin = layoutParams.topMargin = layoutParams.rightMargin = layoutParams.bottomMargin = 0;
         view.setLayoutParams(layoutParams);
+    }
+
+    /**
+     * sets view's bottom margin to specified pixels;
+     *
+     * @param view
+     * @param bottomMargin
+     */
+    private static void setBottomMargins(View view, int bottomMargin) {
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        if(layoutParams != null) {
+            layoutParams.bottomMargin = bottomMargin;
+            view.setLayoutParams(layoutParams);
+        }
     }
 
     /**
@@ -651,6 +673,7 @@ public class UndoBar {
         private int mBkgColor = -1;
         private int mUndoColor = Color.WHITE;
         private boolean mAlignParentBottom;
+        private int mBottomMargin;
 
         private boolean isBackgroundColorCustomized = false;
         private boolean isButtonDrawableCustomized = false;
@@ -866,6 +889,18 @@ public class UndoBar {
             return this;
         }
 
+
+        /**
+         * if this is set, it adds margin from bottom.
+         * only works if style except {@link UndoBar.Style#LOLLIPOP}
+         * @param bottomMargin
+         * @return
+         */
+        public Builder setBottomMargin(int bottomMargin){
+            mBottomMargin = bottomMargin;
+            return this;
+        }
+
         /**
          * Creates an {@link UndoBar} instance with this Builder's
          * configuration.
@@ -888,6 +923,7 @@ public class UndoBar {
                 undoBarController.setBackgroundColor(mBkgColor);
                 undoBarController.setUndoColor(mUndoColor);
                 undoBarController.setAlignParentBottom(mAlignParentBottom);
+                undoBarController.setBottomMargin(mBottomMargin);
 
                 undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
                 undoBarController.setButtonDrawableCustomized(isButtonDrawableCustomized);
