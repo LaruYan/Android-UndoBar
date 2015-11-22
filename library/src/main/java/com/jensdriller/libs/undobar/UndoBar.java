@@ -142,7 +142,7 @@ public class UndoBar {
     }
 
     public UndoBar(Context context, Style style) {
-        this((context instanceof Activity)?(Activity)context:null,style);
+        this((context instanceof Activity)?(Activity)context:(Activity)null,style);
         if(mContext == null){
             mContext = context;
             mButtonVisible = false;
@@ -154,7 +154,7 @@ public class UndoBar {
      * Creates a new undo bar instance to be displayed in the given {@link Activity}.
      */
     public UndoBar(Activity activity) {
-        this(activity.getWindow());
+        this((activity != null)?activity.getWindow():(Window) null);
     }
 
     /**
@@ -167,7 +167,7 @@ public class UndoBar {
      * Lollipop style across all API levels.
      */
     public UndoBar(Activity activity, Style style) {
-        this(activity.getWindow(), style);
+        this((activity != null)?activity.getWindow():(Window) null, style);
     }
 
     /**
@@ -555,14 +555,16 @@ public class UndoBar {
      * Performs the actual hide animation.
      */
     protected void animateOut() {
-        mViewCompat.animateOut(mAnimationDuration, new ViewCompat.AnimatorListener() {
-            @Override
-            public void onAnimationEnd() {
-                mView.setVisibility(View.GONE);
-                mUndoMessage = null;
-                mUndoToken = null;
-            }
-        });
+        if(mViewCompat != null) {
+            mViewCompat.animateOut(mAnimationDuration, new ViewCompat.AnimatorListener() {
+                @Override
+                public void onAnimationEnd() {
+                    mView.setVisibility(View.GONE);
+                    mUndoMessage = null;
+                    mUndoToken = null;
+                }
+            });
+        }
     }
 
     /**
