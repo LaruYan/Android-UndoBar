@@ -395,6 +395,9 @@ public class UndoBar {
      * @param shouldAnimate whether the {@link UndoBar} should animate in
      */
     public void show(boolean shouldAnimate) {
+        if(mView == null){
+            mButtonVisible = false;
+        }
         if(mButtonVisible) {
             if (isBackgroundColorCustomized) {
                 Drawable coloredBackground = mView.getBackground();
