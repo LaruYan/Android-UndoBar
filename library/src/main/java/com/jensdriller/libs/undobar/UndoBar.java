@@ -90,9 +90,9 @@ public class UndoBar {
      */
     public static final int DEFAULT_ANIMATION_DURATION = 300;
 
-    protected final Context mContext;
-    protected final UndoBarView mView;
-    protected final ViewCompat mViewCompat;
+    protected Context mContext;
+    protected UndoBarView mView;
+    protected ViewCompat mViewCompat;
     protected final Handler mHandler = new Handler();
 
     private final Runnable mHideRunnable = new Runnable() {
@@ -131,6 +131,24 @@ public class UndoBar {
     protected boolean isButtonDrawableCustomized;
     protected boolean isButtonLabelCustomized;
     protected boolean isTypefaceCustomized;
+
+
+    public UndoBar(Context context){
+        this((context instanceof Activity)?(Activity)context:null);
+        if(mContext == null){
+            mContext = context;
+            mButtonVisible = false;
+        }
+    }
+
+    public UndoBar(Context context, Style style) {
+        this((context instanceof Activity)?(Activity)context:null,style);
+        if(mContext == null){
+            mContext = context;
+            mButtonVisible = false;
+        }
+    }
+
 
     /**
      * Creates a new undo bar instance to be displayed in the given {@link Activity}.
@@ -193,13 +211,15 @@ public class UndoBar {
             style = Style.DEFAULT;
         }
 
-        mContext = window.getContext();
         mStyle = style;
-        mView = getView(window);
-        mView.setOnUndoClickListener(mOnUndoClickListener);
-        mViewCompat = new ViewCompatImpl(mView);
+        if(window != null) {
+            mContext = window.getContext();
+            mView = getView(window);
+            mView.setOnUndoClickListener(mOnUndoClickListener);
+            mViewCompat = new ViewCompatImpl(mView);
 
-        hide(false);
+            hide(false);
+        }
     }
 
     /**
@@ -228,7 +248,9 @@ public class UndoBar {
      * Sets the button(right of the undo bar) should be shown
      */
     public void setButtonVisible(boolean isVisible){
-        mButtonVisible = isVisible;
+        if(mView != null) {
+            mButtonVisible = isVisible;
+        }
     }
 
     public void setTypeface(Typeface typeface){
@@ -385,22 +407,21 @@ public class UndoBar {
             }
 
             mView.setMessage(mUndoMessage);
-            if (mButtonVisible) {
-                if (isButtonLabelCustomized) {
-                    mView.setButtonLabel(mButtonLabel);
-                } else {
-                    mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
-                }
 
-                if (isLollipopStyle(mStyle)) {
-                    mView.setUndoColor(mUndoColor);
-                    if (mAlignParentBottom && isAlignBottomPossible()) {
-                        removeMargins(mView);
-                    }
-                } else {
-                    if (isButtonDrawableCustomized) {
-                        mView.setButtonDrawable(mButtonDrawable);
-                    }
+            if (isButtonLabelCustomized) {
+                mView.setButtonLabel(mButtonLabel);
+            } else {
+                mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
+            }
+
+            if (isLollipopStyle(mStyle)) {
+                mView.setUndoColor(mUndoColor);
+                if (mAlignParentBottom && isAlignBottomPossible()) {
+                    removeMargins(mView);
+                }
+            } else {
+                if (isButtonDrawableCustomized) {
+                    mView.setButtonDrawable(mButtonDrawable);
                 }
             }
 
@@ -500,8 +521,12 @@ public class UndoBar {
         if (shouldAnimate) {
             animateOut();
         } else {
-            mViewCompat.setAlpha(0);
-            mView.setVisibility(View.GONE);
+            if(mViewCompat != null) {
+                mViewCompat.setAlpha(0);
+            }
+            if(mView != null) {
+                mView.setVisibility(View.GONE);
+            }
             mUndoMessage = null;
             mUndoToken = null;
         }
@@ -604,7 +629,8 @@ public class UndoBar {
 
     public static class Builder {
 
-        private final Window mWindow;
+        private Window mWindow = null;
+        private final Context mCtx;
 
         private boolean mButtonVisible = true;
         private Typeface mTypeface;
@@ -626,12 +652,28 @@ public class UndoBar {
         private boolean isButtonLabelCustomized = false;
         private boolean isTypefaceCustomized = false;
 
+
+        /**
+         * Constructor using the {@link android.content.Context} in which the undo bar will be
+         * displayed
+         * in this mode, when context isn't instanceof Activity, only show in toast mode;
+         */
+        public Builder(Context context) {
+            if (context instanceof Activity){
+                mWindow = ((Activity) context).getWindow();
+                mCtx = mWindow.getContext();
+            }else{
+                mCtx = context;
+            }
+        }
+
         /**
          * Constructor using the {@link android.app.Activity} in which the undo bar will be
          * displayed
          */
         public Builder(Activity activity) {
             mWindow = activity.getWindow();
+            mCtx = mWindow.getContext();
         }
 
         /**
@@ -640,6 +682,7 @@ public class UndoBar {
          */
         public Builder(Dialog dialog) {
             mWindow = dialog.getWindow();
+            mCtx = mWindow.getContext();
         }
 
         /**
@@ -648,13 +691,14 @@ public class UndoBar {
          */
         public Builder(Window window) {
             mWindow = window;
+            mCtx = mWindow.getContext();
         }
 
         /**
          * Sets the message to be displayed on the left of the undo bar.
          */
         public Builder setMessage(int messageResId) {
-            mUndoMessage = mWindow.getContext().getString(messageResId);
+            mUndoMessage = mCtx.getString(messageResId);
             return this;
         }
 
@@ -707,7 +751,7 @@ public class UndoBar {
          */
         public Builder setButtonDrawable(int buttonDrawableRes){
             isButtonDrawableCustomized = true;
-            mButtonDrawable = mWindow.getContext().getResources().getDrawable(buttonDrawableRes);
+            mButtonDrawable = mCtx.getResources().getDrawable(buttonDrawableRes);
             return this;
         }
 
@@ -802,7 +846,7 @@ public class UndoBar {
          * style and ignored otherwise.
          */
         public Builder setUndoColorResId(int undoColorResId) {
-            mUndoColor = mWindow.getContext().getResources().getColor(undoColorResId);
+            mUndoColor = mCtx.getResources().getColor(undoColorResId);
             return this;
         }
 
@@ -822,25 +866,40 @@ public class UndoBar {
          * configuration.
          */
         public UndoBar create() {
-            UndoBar undoBarController = new UndoBar(mWindow, mStyle);
-            undoBarController.setListener(mUndoListener);
-            undoBarController.setUndoToken(mUndoToken);
-            undoBarController.setMessage(mUndoMessage);
-            undoBarController.setButtonVisible(mButtonVisible);
-            undoBarController.setTypeface(mTypeface);
-            undoBarController.setButtonLabel(mButtonLabel);
-            undoBarController.setButtonDrawable(mButtonDrawable);
-            undoBarController.setDuration(mDuration);
-            undoBarController.setAnimationDuration(mAnimationDuration);
-            undoBarController.setUseEnglishLocale(mUseEnglishLocale);
-            undoBarController.setBackgroundColor(mBkgColor);
-            undoBarController.setUndoColor(mUndoColor);
-            undoBarController.setAlignParentBottom(mAlignParentBottom);
+            UndoBar undoBarController = null;
+            if(mWindow != null){
+                undoBarController = new UndoBar(mWindow, mStyle);
+                
+                undoBarController.setListener(mUndoListener);
+                undoBarController.setUndoToken(mUndoToken);
+                undoBarController.setMessage(mUndoMessage);
+                undoBarController.setButtonVisible(mButtonVisible);
+                undoBarController.setTypeface(mTypeface);
+                undoBarController.setButtonLabel(mButtonLabel);
+                undoBarController.setButtonDrawable(mButtonDrawable);
+                undoBarController.setDuration(mDuration);
+                undoBarController.setAnimationDuration(mAnimationDuration);
+                undoBarController.setUseEnglishLocale(mUseEnglishLocale);
+                undoBarController.setBackgroundColor(mBkgColor);
+                undoBarController.setUndoColor(mUndoColor);
+                undoBarController.setAlignParentBottom(mAlignParentBottom);
 
-            undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
-            undoBarController.setButtonDrawableCustomized(isButtonDrawableCustomized);
-            undoBarController.setButtonLabelCustomized(isButtonLabelCustomized);
-            undoBarController.setTypefaceCustomized(isTypefaceCustomized);
+                undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
+                undoBarController.setButtonDrawableCustomized(isButtonDrawableCustomized);
+                undoBarController.setButtonLabelCustomized(isButtonLabelCustomized);
+                undoBarController.setTypefaceCustomized(isTypefaceCustomized);
+            }else{
+                undoBarController = new UndoBar(mCtx, mStyle);
+
+                undoBarController.setMessage(mUndoMessage);
+                undoBarController.setTypeface(mTypeface);
+                undoBarController.setDuration(mDuration);
+                undoBarController.setBackgroundColor(mBkgColor);
+                undoBarController.setAlignParentBottom(mAlignParentBottom);
+
+                undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
+                undoBarController.setTypefaceCustomized(isTypefaceCustomized);
+            }
 
             return undoBarController;
         }
