@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,6 +82,12 @@ public class UndoBar {
         void onUndo(Parcelable token);
     }
 
+    public static final int TEXT_SIZE_LARGE = -13;
+    public static final int TEXT_SIZE_MEDIUM = -12;
+    public static final int TEXT_SIZE_SMALL = -11;
+    public static final int TEXT_SIZE_NOTSET = -10;
+    public static final int DEFAULT_TEXT_SIZE = TEXT_SIZE_NOTSET;
+
     /**
      * Default duration in milliseconds the undo bar will be displayed.
      */
@@ -127,6 +134,7 @@ public class UndoBar {
     protected int mUndoColor = Color.WHITE;
     protected boolean mAlignParentBottom;
     protected int mBottomMargin;
+    protected int mTextSize;
 
     protected boolean isBackgroundColorCustomized;
     protected boolean isButtonDrawableCustomized;
@@ -367,8 +375,21 @@ public class UndoBar {
         mAlignParentBottom = alignParentBottom;
     }
 
+    /**
+     * if this is set, it adds margin from bottom.
+     * only works if style except {@link UndoBar.Style#LOLLIPOP}
+     * @param bottomMargin
+     */
     public void setBottomMargin(int bottomMargin) {
         mBottomMargin = bottomMargin;
+    }
+
+    /**
+     * setting Text Size in pixel, only numbers greater than 0 are allowed;
+     * @param textSize
+     */
+    public void setTextSize(int textSize){
+        mTextSize = textSize;
     }
 
     private void setButtonLabelCustomized(boolean isCustomized) {
@@ -412,6 +433,28 @@ public class UndoBar {
 
             if (isTypefaceCustomized) {
                 mView.setTypeface(mTypeface);
+            }
+
+            if(mTextSize > 0){
+                //set textsize in pixel
+                mView.setTextSize(mTextSize);
+            }else{
+                //set textsize in preset;
+                switch(mTextSize){
+                    case TEXT_SIZE_LARGE:
+                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_large));
+                        break;
+                    case TEXT_SIZE_MEDIUM:
+                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_medium));
+                        break;
+                    case TEXT_SIZE_SMALL:
+                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_small));
+                        break;
+                    default:
+                    case TEXT_SIZE_NOTSET:
+                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_normal));
+                        break;
+                }
             }
 
             mView.setMessage(mUndoMessage);
@@ -462,8 +505,31 @@ public class UndoBar {
                 coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
                 toastLayout.setBackgroundDrawable(coloredBackground);
             }
+
             if(isTypefaceCustomized) {
                 tvMessage.setTypeface(mTypeface);
+            }
+
+            if(mTextSize > 0){
+                //set textsize in pixel
+                tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+            }else{
+                //set textsize in preset;
+                switch(mTextSize){
+                    case TEXT_SIZE_LARGE:
+                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_large));
+                        break;
+                    case TEXT_SIZE_MEDIUM:
+                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_medium));
+                        break;
+                    case TEXT_SIZE_SMALL:
+                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_small));
+                        break;
+                    default:
+                    case TEXT_SIZE_NOTSET:
+                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_normal));
+                        break;
+                }
             }
 
             Toast toast = new Toast(mContext);
@@ -674,6 +740,7 @@ public class UndoBar {
         private int mUndoColor = Color.WHITE;
         private boolean mAlignParentBottom;
         private int mBottomMargin;
+        private int mTextSize = DEFAULT_TEXT_SIZE;
 
         private boolean isBackgroundColorCustomized = false;
         private boolean isButtonDrawableCustomized = false;
@@ -902,6 +969,17 @@ public class UndoBar {
         }
 
         /**
+         * setting Text Size in pixel, only numbers greater than 0 are allowed;
+         *
+         * @param textSize
+         * @return
+         */
+        public Builder setTextSize(int textSize){
+            mTextSize = textSize;
+            return this;
+        }
+
+        /**
          * Creates an {@link UndoBar} instance with this Builder's
          * configuration.
          */
@@ -924,11 +1002,13 @@ public class UndoBar {
                 undoBarController.setUndoColor(mUndoColor);
                 undoBarController.setAlignParentBottom(mAlignParentBottom);
                 undoBarController.setBottomMargin(mBottomMargin);
+                undoBarController.setTextSize(mTextSize);
 
                 undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
                 undoBarController.setButtonDrawableCustomized(isButtonDrawableCustomized);
                 undoBarController.setButtonLabelCustomized(isButtonLabelCustomized);
                 undoBarController.setTypefaceCustomized(isTypefaceCustomized);
+
             }else{
                 undoBarController = new UndoBar(mCtx, mStyle);
 
@@ -937,6 +1017,7 @@ public class UndoBar {
                 undoBarController.setDuration(mDuration);
                 undoBarController.setBackgroundColor(mBkgColor);
                 undoBarController.setAlignParentBottom(mAlignParentBottom);
+                undoBarController.setTextSize(mTextSize);
 
                 undoBarController.setBackgroundColorCustomized(isBackgroundColorCustomized);
                 undoBarController.setTypefaceCustomized(isTypefaceCustomized);

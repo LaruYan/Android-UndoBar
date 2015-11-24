@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
@@ -57,6 +58,11 @@ class UndoBarView extends MaxWidthRelativeLayout {
 
 	void setMessage(CharSequence message) {
 		mMessage.setText(message);
+	}
+
+	void setTextSize(int textSize){
+		mMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+		mButton.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 	}
 
 	void setButtonLabel(CharSequence buttonLabel) {
