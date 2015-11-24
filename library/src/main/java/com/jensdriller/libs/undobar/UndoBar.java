@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -492,6 +493,10 @@ public class UndoBar {
             View toastLayout = LayoutInflater.from(mContext).inflate(mStyle.getLayoutResId(), null);
             setBottomMargins(toastLayout, mBottomMargin);
 
+            ViewGroup.LayoutParams tlLp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//toastLayout.getLayoutParams();
+            tlLp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            toastLayout.setLayoutParams(tlLp);
+
             View divider = toastLayout.findViewById(R.id.divider);
             if(divider != null){
                 divider.setVisibility(View.GONE);
@@ -499,6 +504,11 @@ public class UndoBar {
             (toastLayout.findViewById(R.id.button)).setVisibility(View.GONE);
 
             TextView tvMessage = (TextView) toastLayout.findViewById(R.id.message);
+
+            RelativeLayout.LayoutParams tmLp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//tvMessage.getLayoutParams();
+            tmLp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            tvMessage.setLayoutParams(tmLp);
+
             tvMessage.setText(mUndoMessage);
             if (isBackgroundColorCustomized) {
                 Drawable coloredBackground = toastLayout.getBackground();
