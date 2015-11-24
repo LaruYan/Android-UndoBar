@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -101,7 +102,7 @@ public class UndoBar {
     protected Context mContext;
     protected UndoBarView mView;
     protected ViewCompat mViewCompat;
-    protected final Handler mHandler = new Handler();
+    protected final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private final Runnable mHideRunnable = new Runnable() {
 
