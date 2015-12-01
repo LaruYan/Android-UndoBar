@@ -422,140 +422,145 @@ public class UndoBar {
      *
      * @param shouldAnimate whether the {@link UndoBar} should animate in
      */
-    public void show(boolean shouldAnimate) {
-        if(mView == null){
-            mButtonVisible = false;
-        }
-        if(mButtonVisible) {
-            if (isBackgroundColorCustomized) {
-                Drawable coloredBackground = mView.getBackground();
-                coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
-                mView.setBackgroundDrawable(coloredBackground);
-            }
+    public void show(final boolean shouldAnimate) {
+        mHandler.post(new Runnable(){
+            @Override
+            public void run() {
+                if(mView == null){
+                    mButtonVisible = false;
+                }
+                if(mButtonVisible) {
+                    if (isBackgroundColorCustomized) {
+                        Drawable coloredBackground = mView.getBackground();
+                        coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
+                        mView.setBackgroundDrawable(coloredBackground);
+                    }
 
-            if (isTypefaceCustomized) {
-                mView.setTypeface(mTypeface);
-            }
+                    if (isTypefaceCustomized) {
+                        mView.setTypeface(mTypeface);
+                    }
 
-            if(mTextSize > 0){
-                //set textsize in pixel
-                mView.setTextSize(mTextSize);
-            }else{
-                //set textsize in preset;
-                switch(mTextSize){
-                    case TEXT_SIZE_LARGE:
-                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_large));
-                        break;
-                    case TEXT_SIZE_MEDIUM:
-                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_medium));
-                        break;
-                    case TEXT_SIZE_SMALL:
-                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_small));
-                        break;
-                    default:
-                    case TEXT_SIZE_NOTSET:
-                        mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_normal));
-                        break;
+                    if(mTextSize > 0){
+                        //set textsize in pixel
+                        mView.setTextSize(mTextSize);
+                    }else{
+                        //set textsize in preset;
+                        switch(mTextSize){
+                            case TEXT_SIZE_LARGE:
+                                mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_large));
+                                break;
+                            case TEXT_SIZE_MEDIUM:
+                                mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_medium));
+                                break;
+                            case TEXT_SIZE_SMALL:
+                                mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_small));
+                                break;
+                            default:
+                            case TEXT_SIZE_NOTSET:
+                                mView.setTextSize((int)mContext.getResources().getDimension(R.dimen.undo_bar_text_size_normal));
+                                break;
+                        }
+                    }
+
+                    mView.setMessage(mUndoMessage);
+
+                    if (isButtonLabelCustomized) {
+                        mView.setButtonLabel(mButtonLabel);
+                    } else {
+                        mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
+                    }
+
+                    if (isLollipopStyle(mStyle)) {
+                        mView.setUndoColor(mUndoColor);
+                        if (mAlignParentBottom && isAlignBottomPossible()) {
+                            removeMargins(mView);
+                        }
+                    } else {
+                        if (isButtonDrawableCustomized) {
+                            mView.setButtonDrawable(mButtonDrawable);
+                        }
+                        setBottomMargins(mView, mBottomMargin);
+                    }
+
+                    mHandler.removeCallbacks(mHideRunnable);
+                    mHandler.postDelayed(mHideRunnable, mDuration);
+
+                    mView.setVisibility(View.VISIBLE);
+                    if (shouldAnimate) {
+                        animateIn();
+                    } else {
+                        mViewCompat.setAlpha(1);
+                    }
+                }else{
+                    //I dreamed in a dream...
+                    //lets get back to stock-style Toast.
+                    View toastLayout = LayoutInflater.from(mContext).inflate(mStyle.getLayoutResId(), null);
+                    setBottomMargins(toastLayout, mBottomMargin);
+
+                    ViewGroup.LayoutParams tlLp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//toastLayout.getLayoutParams();
+                    tlLp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    toastLayout.setLayoutParams(tlLp);
+
+                    View divider = toastLayout.findViewById(R.id.divider);
+                    if(divider != null){
+                        divider.setVisibility(View.GONE);
+                    }
+                    (toastLayout.findViewById(R.id.button)).setVisibility(View.GONE);
+
+                    TextView tvMessage = (TextView) toastLayout.findViewById(R.id.message);
+
+                    RelativeLayout.LayoutParams tmLp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//tvMessage.getLayoutParams();
+                    tmLp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    tvMessage.setLayoutParams(tmLp);
+
+                    tvMessage.setText(mUndoMessage);
+                    if (isBackgroundColorCustomized) {
+                        Drawable coloredBackground = toastLayout.getBackground();
+                        coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
+                        toastLayout.setBackgroundDrawable(coloredBackground);
+                    }
+
+                    if(isTypefaceCustomized) {
+                        tvMessage.setTypeface(mTypeface);
+                    }
+
+                    if(mTextSize > 0){
+                        //set textsize in pixel
+                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+                    }else{
+                        //set textsize in preset;
+                        switch(mTextSize){
+                            case TEXT_SIZE_LARGE:
+                                tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_large));
+                                break;
+                            case TEXT_SIZE_MEDIUM:
+                                tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_medium));
+                                break;
+                            case TEXT_SIZE_SMALL:
+                                tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_small));
+                                break;
+                            default:
+                            case TEXT_SIZE_NOTSET:
+                                tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_normal));
+                                break;
+                        }
+                    }
+
+                    Toast toast = new Toast(mContext);
+                    toast.setView(toastLayout);
+                    toast.setDuration(mDuration > DEFAULT_DURATION ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+                    if (isLollipopStyle(mStyle)) {
+                        toast.setGravity(Gravity.BOTTOM, 0, 0);
+                        toast.setMargin(0.0f, 0.0f);//but this don't makes us to margin bottom;
+                    }
+                    toast.show();
+
+                    ///for compatibility measures;
+                    mHandler.removeCallbacks(mHideRunnable);
+                    mHandler.postDelayed(mHideRunnable, mDuration);
                 }
             }
-
-            mView.setMessage(mUndoMessage);
-
-            if (isButtonLabelCustomized) {
-                mView.setButtonLabel(mButtonLabel);
-            } else {
-                mView.setButtonLabel(mUseEnglishLocale ? R.string.undo_english : R.string.undo);
-            }
-
-            if (isLollipopStyle(mStyle)) {
-                mView.setUndoColor(mUndoColor);
-                if (mAlignParentBottom && isAlignBottomPossible()) {
-                    removeMargins(mView);
-                }
-            } else {
-                if (isButtonDrawableCustomized) {
-                    mView.setButtonDrawable(mButtonDrawable);
-                }
-                setBottomMargins(mView, mBottomMargin);
-            }
-
-            mHandler.removeCallbacks(mHideRunnable);
-            mHandler.postDelayed(mHideRunnable, mDuration);
-
-            mView.setVisibility(View.VISIBLE);
-            if (shouldAnimate) {
-                animateIn();
-            } else {
-                mViewCompat.setAlpha(1);
-            }
-        }else{
-            //I dreamed in a dream...
-            //lets get back to stock-style Toast.
-            View toastLayout = LayoutInflater.from(mContext).inflate(mStyle.getLayoutResId(), null);
-            setBottomMargins(toastLayout, mBottomMargin);
-
-            ViewGroup.LayoutParams tlLp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//toastLayout.getLayoutParams();
-            tlLp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            toastLayout.setLayoutParams(tlLp);
-
-            View divider = toastLayout.findViewById(R.id.divider);
-            if(divider != null){
-                divider.setVisibility(View.GONE);
-            }
-            (toastLayout.findViewById(R.id.button)).setVisibility(View.GONE);
-
-            TextView tvMessage = (TextView) toastLayout.findViewById(R.id.message);
-
-            RelativeLayout.LayoutParams tmLp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//tvMessage.getLayoutParams();
-            tmLp.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            tvMessage.setLayoutParams(tmLp);
-
-            tvMessage.setText(mUndoMessage);
-            if (isBackgroundColorCustomized) {
-                Drawable coloredBackground = toastLayout.getBackground();
-                coloredBackground.setColorFilter(mBkgColor, PorterDuff.Mode.SRC_IN);
-                toastLayout.setBackgroundDrawable(coloredBackground);
-            }
-
-            if(isTypefaceCustomized) {
-                tvMessage.setTypeface(mTypeface);
-            }
-
-            if(mTextSize > 0){
-                //set textsize in pixel
-                tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
-            }else{
-                //set textsize in preset;
-                switch(mTextSize){
-                    case TEXT_SIZE_LARGE:
-                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_large));
-                        break;
-                    case TEXT_SIZE_MEDIUM:
-                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_medium));
-                        break;
-                    case TEXT_SIZE_SMALL:
-                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_small));
-                        break;
-                    default:
-                    case TEXT_SIZE_NOTSET:
-                        tvMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, (int) mContext.getResources().getDimension(R.dimen.undo_bar_text_size_normal));
-                        break;
-                }
-            }
-
-            Toast toast = new Toast(mContext);
-            toast.setView(toastLayout);
-            toast.setDuration(mDuration > DEFAULT_DURATION ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
-            if (isLollipopStyle(mStyle)) {
-                toast.setGravity(Gravity.BOTTOM, 0, 0);
-                toast.setMargin(0.0f, 0.0f);//but this don't makes us to margin bottom;
-            }
-            toast.show();
-
-            ///for compatibility measures;
-            mHandler.removeCallbacks(mHideRunnable);
-            mHandler.postDelayed(mHideRunnable, mDuration);
-        }
+        });
     }
 
     /**
@@ -718,17 +723,29 @@ public class UndoBar {
             rootView = decorView;
         }
 
+        final ViewGroup finalRootView = rootView;
         // if it's the first undo bar in this window or a different style, inflate a new instance
-        UndoBarView undoBarView = (UndoBarView) rootView.findViewById(R.id.undoBar);
-        if (undoBarView == null || undoBarView.getTag() != mStyle) {
-            rootView.removeView(undoBarView); // remove potential undo bar w/ different style
-            undoBarView = (UndoBarView) LayoutInflater.from(rootView.getContext())
-                    .inflate(mStyle.getLayoutResId(), rootView, false);
-            undoBarView.setTag(mStyle);
-            rootView.addView(undoBarView);
+        final UndoBarView removeUndoBarView = (UndoBarView) finalRootView.findViewById(R.id.undoBar);
+        if (removeUndoBarView == null || removeUndoBarView.getTag() != mStyle) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    finalRootView.removeView(removeUndoBarView); // remove potential undo bar w/ different style
+                }
+            });
+            final UndoBarView addUndoBarView = (UndoBarView) LayoutInflater.from(finalRootView.getContext())
+                    .inflate(mStyle.getLayoutResId(), finalRootView, false);
+            addUndoBarView.setTag(mStyle);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    finalRootView.addView(addUndoBarView);
+                }
+            });
+            return addUndoBarView;
         }
 
-        return undoBarView;
+        return removeUndoBarView;
     }
 
     public static class Builder {
@@ -1041,7 +1058,7 @@ public class UndoBar {
          * Calls {@link #show(boolean)} with {@code shouldAnimate = true}.
          */
         public void show() {
-            show(true);
+           show(true);
         }
 
         /**
